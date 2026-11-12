@@ -28,6 +28,7 @@ public class AnalysisService {
     private final SteeringAnalyzer steeringAnalyzer;
     private final ConsistencyAnalyzer consistencyAnalyzer;
     private final ObjectMapper objectMapper;
+    private final SectorAnalyzer sectorAnalyzer;
 
     @Transactional
     public LapAnalysisDTO analyzeLap(UUID lapId) {
@@ -43,6 +44,7 @@ public class AnalysisService {
         metrics.addAll(throttleAnalyzer.analyze(points));
         metrics.addAll(steeringAnalyzer.analyze(points));
         metrics.addAll(consistencyAnalyzer.analyze(points));
+        metrics.addAll(sectorAnalyzer.analyze(points));
 
         LapAnalysisEntity analysis = lapAnalysisRepository.findByLapId(lapId)
                 .orElseGet(() -> LapAnalysisEntity.builder()

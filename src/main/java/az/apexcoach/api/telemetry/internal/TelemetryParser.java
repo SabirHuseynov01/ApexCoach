@@ -1,4 +1,11 @@
 package az.apexcoach.api.telemetry.internal;
 
-public class TelemetryParser {
+import az.apexcoach.api.simulation.NormalizedTelemetry;
+import az.apexcoach.api.simulation.SimulationType;
+
+public interface TelemetryParser {
+
+    SimulationType supports();
+
+    NormalizedTelemetry parse(byte[] content);
 }
