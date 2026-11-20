@@ -4,12 +4,13 @@ import az.apexcoach.api.analysis.internal.*;
 
 import az.apexcoach.api.telemetry.internal.LapEntity;
 import az.apexcoach.api.telemetry.internal.LapRepository;
+import az.apexcoach.api.telemetry.internal.TelemetryPointEntity;
 import az.apexcoach.api.telemetry.internal.TelemetryPointRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shared.error.NotFoundException;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class AnalysisService {
         LapEntity lap = lapRepository.findById(lapId)
                 .orElseThrow(() -> new NotFoundException("Lap not found"));
 
-        List<az.apexcoach.api.telemetry.internal.TelemetryPointEntity> points =
+        List<TelemetryPointEntity> points =
                 telemetryPointRepository.findByLapIdOrderBySessionTimeAsc(lapId);
 
         List<DrivingMetric> metrics = new ArrayList<>();

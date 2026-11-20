@@ -5,10 +5,7 @@ import az.apexcoach.api.telemetry.internal.TelemetryPointEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import List;
 import java.util.List;
-
-import static jdk.internal.org.jline.reader.impl.LineReaderImpl.CompletionType.List;
 
 @Component
 public class ThrottleAnalyzer {
