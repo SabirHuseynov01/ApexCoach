@@ -2,10 +2,12 @@ package az.apexcoach.api.telemetry;
 
 
 import az.apexcoach.api.identity.UserEntity;
+import az.apexcoach.api.identity.UserLookupPort;
 import az.apexcoach.api.identity.internal.UserRepository;
 
 import az.apexcoach.api.simulation.NormalizedLap;
 import az.apexcoach.api.simulation.NormalizedTelemetry;
+import az.apexcoach.api.simulation.SimulationTelemetryService;
 import az.apexcoach.api.simulation.SimulationType;
 import az.apexcoach.api.simulation.internal.registry.TelemetryAdapterRegistry;
 import az.apexcoach.api.telemetry.internal.*;
@@ -26,13 +28,13 @@ public class TelemetryService {
 
     private final TelemetryFileRepository telemetryFileRepository;
     private final LapRepository lapRepository;
-    private final UserRepository userRepository;
-    private final TelemetryAdapterRegistry adapterRegistry;
+    private final UserLookupPort userLookupPort;
+    private final SimulationTelemetryService simulationTelemetryService;
+    private final CsvTelemetryParser csvTelemetryParser;
 
     @Transactional
     public TelemetryUploadResponse upload(String email, SimulationType simulationType, MultipartFile file) {
-        UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+        UserEntity user = userLookupPort.requireUser(email);
 
         byte[] content;
 
@@ -42,9 +44,9 @@ public class TelemetryService {
             throw new NotFoundException("Unable to read uploaded file");
         }
 
-        NormalizedTelemetry normalized = adapterRegistry
-                .get(simulationType)
-                .parse(content);
+        NormalizedTelemetry normalized = simulationType == SimulationType.GENERIC_CSV
+                ? csvTelemetryParser.parse(content)
+                : simulationTelemetryService.parse(simulationType, content);
 
         TelemetryFileEntity telemetryFile = TelemetryFileEntity.builder()
                 .user(user)

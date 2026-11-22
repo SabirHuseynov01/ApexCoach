@@ -4,7 +4,6 @@ import az.apexcoach.api.identity.internal.PasswordHasher;
 import az.apexcoach.api.identity.internal.UserRepository;
 import az.apexcoach.api.security.JwtService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shared.error.NotFoundException;
@@ -18,7 +17,6 @@ public class IdentityService {
     private final UserRepository userRepository;
     private final PasswordHasher passwordHasher;
     private final JwtService jwtService;
-    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -38,7 +36,7 @@ public class IdentityService {
         userRepository.save(user);
 
         return new AuthResponse(
-                jwtService.generateToken(user),
+                tokenFor(user),
                 toDto(user)
         );
     }
@@ -53,7 +51,7 @@ public class IdentityService {
         }
 
         return new AuthResponse(
-                jwtService.generateToken(user),
+                tokenFor(user),
                 toDto(user)
         );
     }
@@ -64,6 +62,10 @@ public class IdentityService {
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
         return toDto(user);
+    }
+
+    private String tokenFor(UserEntity user) {
+        return jwtService.generateToken(user.getEmail(), user.getRole().name(), user.getDisplayName());
     }
 
     private UserDTO toDto(UserEntity user) {

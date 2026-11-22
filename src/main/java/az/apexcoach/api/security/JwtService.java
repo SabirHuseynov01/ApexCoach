@@ -1,6 +1,5 @@
 package az.apexcoach.api.security;
 
-import az.apexcoach.api.identity.UserEntity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -22,14 +21,14 @@ public class JwtService {
         this.key = Keys.hmacShaKeyFor(properties.getJwtSecret().getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(UserEntity user) {
+    public String generateToken(String email, String role, String displayName) {
         Instant now = Instant.now();
         Instant expiresAt = now.plusSeconds(properties.getJwtExpiration());
 
         return Jwts.builder()
-                .subject(user.getEmail())
-                .claim("role", user.getRole().name())
-                .claim("name", user.getDisplayName())
+                .subject(email)
+                .claim("role", role)
+                .claim("name", displayName)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiresAt))
                 .signWith(key)

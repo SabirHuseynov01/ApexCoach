@@ -15,7 +15,7 @@ public class GenericCsvLapBuilder {
         Map<Integer, List<NormalizedTelemetryPoint>> laps = new TreeMap<>();
 
         for (Map<String, String> row : rows) {
-            int lapNumber = parseInt(row.get("lap"), 1);
+            int lapNumber = parseInt(row.get("lapNumber"), 1);
             laps.computeIfAbsent(lapNumber, k -> new ArrayList<>())
                     .add(toPoint(row));
         }

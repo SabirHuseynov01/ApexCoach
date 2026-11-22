@@ -22,7 +22,7 @@ public class GenericCsvParser {
                 throw new TelemetryParseException("CSV file is empty");
             }
 
-            String[] headers = headerLine.split(",");
+            String[] headers = mapHeaders(headerLine.split(","));
             List<Map<String, String>> rows = new ArrayList<>();
 
             String line;
@@ -46,5 +46,16 @@ public class GenericCsvParser {
         } catch (Exception e) {
             throw new TelemetryParseException("Unable to parse CSV telemetry", e);
         }
+    }
+
+    private String[] mapHeaders(String[] headers) {
+        String[] mapped = new String[headers.length];
+
+        for (int i = 0; i < headers.length; i++) {
+            String header = headers[i].trim();
+            mapped[i] = GenericCsvColumnMapper.DEFAULT_COLUMNS.getOrDefault(header, header);
+        }
+
+        return mapped;
     }
 }
