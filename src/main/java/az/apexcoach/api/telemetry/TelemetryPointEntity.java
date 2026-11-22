@@ -1,4 +1,4 @@
-package az.apexcoach.api.telemetry.internal;
+package az.apexcoach.api.telemetry;
 
 import jakarta.persistence.*;
 import lombok.*;

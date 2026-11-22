@@ -9,7 +9,7 @@ import az.apexcoach.api.simulation.TelemetrySource;
 import az.apexcoach.api.simulation.internal.generic.GenericCsvAdapter;
 import az.apexcoach.api.simulation.internal.generic.GenericCsvLapBuilder;
 import az.apexcoach.api.simulation.internal.generic.GenericCsvParser;
-import az.apexcoach.api.simulation.internal.registry.TelemetryAdapterRegistry;
+import az.apexcoach.api.simulation.TelemetryAdapterRegistry;
 import az.apexcoach.api.telemetry.internal.CsvTelemetryParser;
 import org.junit.jupiter.api.Test;
 import shared.error.TelemetryParseException;

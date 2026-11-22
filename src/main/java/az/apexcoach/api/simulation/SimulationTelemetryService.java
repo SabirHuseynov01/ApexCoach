@@ -1,6 +1,5 @@
 package az.apexcoach.api.simulation;
 
-import az.apexcoach.api.simulation.internal.registry.TelemetryAdapterRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

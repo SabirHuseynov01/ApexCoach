@@ -1,7 +1,7 @@
 package az.apexcoach.api.analysis.internal;
 
 import az.apexcoach.api.analysis.AnalysisStatus;
-import az.apexcoach.api.telemetry.internal.LapEntity;
+import az.apexcoach.api.telemetry.LapEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

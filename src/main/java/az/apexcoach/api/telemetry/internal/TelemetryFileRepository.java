@@ -6,6 +6,4 @@ import java.util.List;
 import java.util.UUID;
 
 public interface TelemetryFileRepository extends JpaRepository<TelemetryFileEntity, UUID> {
-
-    List<TelemetryFileEntity> findByUserIdOrderByUploadedAtDesc(UUID userId);
 }

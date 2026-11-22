@@ -18,6 +18,6 @@ public class CoachingController {
             @CurrentUser String email,
             @Valid @RequestBody CoachingRequest request
     ) {
-        return ResponseEntity.ok(coachingService.coach(request.lapId()));
+        return ResponseEntity.ok(coachingService.coach(email, request.lapId()));
     }
 }

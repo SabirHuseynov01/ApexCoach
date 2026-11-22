@@ -19,7 +19,7 @@ public class AnalysisController {
             @CurrentUser String email,
             @PathVariable UUID lapId
     ) {
-        return ResponseEntity.ok(analysisService.analyzeLap(lapId));
+        return ResponseEntity.ok(analysisService.analyzeLap(email, lapId));
     }
 
     @GetMapping("/laps/{lapId}")
@@ -27,6 +27,6 @@ public class AnalysisController {
             @CurrentUser String email,
             @PathVariable UUID lapId
     ) {
-        return ResponseEntity.ok(analysisService.getAnalysis(lapId));
+        return ResponseEntity.ok(analysisService.getAnalysis(email, lapId));
     }
 }

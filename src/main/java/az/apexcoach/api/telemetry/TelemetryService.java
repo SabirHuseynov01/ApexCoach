@@ -3,13 +3,11 @@ package az.apexcoach.api.telemetry;
 
 import az.apexcoach.api.identity.UserEntity;
 import az.apexcoach.api.identity.UserLookupPort;
-import az.apexcoach.api.identity.internal.UserRepository;
 
 import az.apexcoach.api.simulation.NormalizedLap;
 import az.apexcoach.api.simulation.NormalizedTelemetry;
 import az.apexcoach.api.simulation.SimulationTelemetryService;
 import az.apexcoach.api.simulation.SimulationType;
-import az.apexcoach.api.simulation.internal.registry.TelemetryAdapterRegistry;
 import az.apexcoach.api.telemetry.internal.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

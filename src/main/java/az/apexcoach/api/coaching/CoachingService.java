@@ -18,8 +18,8 @@ public class CoachingService {
     private final AnalysisService analysisService;
 
     @Transactional(readOnly = true)
-    public CoachingResponse coach(UUID lapId) {
-        LapAnalysisDTO analysis = analysisService.getAnalysis(lapId);
+    public CoachingResponse coach(String email, UUID lapId) {
+        LapAnalysisDTO analysis = analysisService.getAnalysis(email, lapId);
 
         List<String> actionItems = new ArrayList<>();
 

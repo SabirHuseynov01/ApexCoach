@@ -2,10 +2,11 @@ package az.apexcoach.api.analysis;
 
 import az.apexcoach.api.analysis.internal.*;
 
-import az.apexcoach.api.telemetry.internal.LapEntity;
-import az.apexcoach.api.telemetry.internal.LapRepository;
-import az.apexcoach.api.telemetry.internal.TelemetryPointEntity;
-import az.apexcoach.api.telemetry.internal.TelemetryPointRepository;
+
+import az.apexcoach.api.telemetry.LapEntity;
+import az.apexcoach.api.telemetry.LapRepository;
+import az.apexcoach.api.telemetry.TelemetryPointEntity;
+import az.apexcoach.api.telemetry.TelemetryPointRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,9 +33,8 @@ public class AnalysisService {
     private final SectorAnalyzer sectorAnalyzer;
 
     @Transactional
-    public LapAnalysisDTO analyzeLap(UUID lapId) {
-        LapEntity lap = lapRepository.findById(lapId)
-                .orElseThrow(() -> new NotFoundException("Lap not found"));
+    public LapAnalysisDTO analyzeLap(String email, UUID lapId) {
+        LapEntity lap = requireOwnedLap(lapId, email);
 
         List<TelemetryPointEntity> points =
                 telemetryPointRepository.findByLapIdOrderBySessionTimeAsc(lapId);
@@ -66,7 +66,9 @@ public class AnalysisService {
     }
 
     @Transactional(readOnly = true)
-    public LapAnalysisDTO getAnalysis(UUID lapId) {
+    public LapAnalysisDTO getAnalysis(String email, UUID lapId) {
+        requireOwnedLap(lapId, email);
+
         LapAnalysisEntity analysis = lapAnalysisRepository.findByLapId(lapId)
                 .orElseThrow(() -> new NotFoundException("Analysis not found"));
 
@@ -75,11 +77,22 @@ public class AnalysisService {
         return new LapAnalysisDTO(lapId, analysis.getStatus(), metrics);
     }
 
+    private LapEntity requireOwnedLap(UUID lapId, String email) {
+        LapEntity lap = lapRepository.findById(lapId)
+                .orElseThrow(() -> new NotFoundException("Lap not found"));
+
+        if (!email.equals(lap.getTelemetryFile().getUser().getEmail())) {
+            throw new NotFoundException("Lap not found");
+        }
+
+        return lap;
+    }
+
     private String toJson(List<DrivingMetric> metrics) {
         try {
             return objectMapper.writeValueAsString(metrics);
         } catch (Exception e) {
-            throw new NotFoundException("Unable to serialize analysis result");
+            throw new IllegalStateException("Unable to serialize analysis result", e);
         }
     }
 
@@ -87,7 +100,7 @@ public class AnalysisService {
         try {
             return List.of(objectMapper.readValue(json, DrivingMetricDTO[].class));
         } catch (Exception e) {
-            throw new NotFoundException("Unable to read analysis result");
+            throw new IllegalStateException("Unable to read analysis result", e);
         }
     }
 }

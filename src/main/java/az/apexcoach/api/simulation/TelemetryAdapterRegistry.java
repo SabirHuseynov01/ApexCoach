@@ -1,7 +1,5 @@
-package az.apexcoach.api.simulation.internal.registry;
+package az.apexcoach.api.simulation;
 
-import az.apexcoach.api.simulation.SimulationTelemetryAdapter;
-import az.apexcoach.api.simulation.SimulationType;
 import org.springframework.stereotype.Component;
 import shared.error.NotFoundException;
 import shared.error.UnsupportedSimulationException;

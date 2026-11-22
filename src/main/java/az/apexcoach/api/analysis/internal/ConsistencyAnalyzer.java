@@ -1,7 +1,7 @@
 package az.apexcoach.api.analysis.internal;
 
 import az.apexcoach.api.analysis.DrivingMetricType;
-import az.apexcoach.api.telemetry.internal.TelemetryPointEntity;
+import az.apexcoach.api.telemetry.TelemetryPointEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
