@@ -23,7 +23,7 @@ public class GenericCsvLapBuilder {
         return laps.entrySet().stream()
                 .map(entry -> new NormalizedLap(
                         entry.getKey(),
-                        parseDouble(entry.getValue().getLast().get("lapTime")),
+                        entry.getValue().getLast().lapTime(),
                         null,
                         null,
                         null,

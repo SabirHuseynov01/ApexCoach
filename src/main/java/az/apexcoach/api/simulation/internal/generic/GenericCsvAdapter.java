@@ -1,9 +1,6 @@
 package az.apexcoach.api.simulation.internal.generic;
 
-import az.apexcoach.api.simulation.NormalizedTelemetry;
-import az.apexcoach.api.simulation.SimulationTelemetryAdapter;
-import az.apexcoach.api.simulation.SimulationType;
-import az.apexcoach.api.simulation.TelemetrySource;
+import az.apexcoach.api.simulation.*;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -55,11 +52,11 @@ public class GenericCsvAdapter implements SimulationTelemetryAdapter {
                         "Unknown car",
                         "Unknown"
                 ),
-                new az.apexcoach.api.simulation.TrackInfo("Unknown track", null, null),
-                new az.apexcoach.api.simulation.CarInfo("Unknown car", null, null),
-                new az.apexcoach.api.simulation.DriverInfo("Unknown driver", null),
-                new az.apexcoach.api.simulation.WeatherInfo("Unknown", null, null),
-                new az.apexcoach.api.simulation.TelemetryQuality(
+                new TrackInfo("Unknown track", null, null),
+                new CarInfo("Unknown car", null, null),
+                new DriverInfo("Unknown driver", null),
+                new WeatherInfo("Unknown", null, null),
+                new TelemetryQuality(
                         true, true, false, false, false, false, 0, 0
                 ),
                 lapBuilder.build(rows)

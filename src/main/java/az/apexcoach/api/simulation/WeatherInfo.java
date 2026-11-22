@@ -1,4 +1,7 @@
 package az.apexcoach.api.simulation;
 
-public class WeatherInfo {
-}
+public record WeatherInfo(
+        String condition,
+        Double airTemperatureCelsius,
+        Double trackTemperatureCelsius
+) {}
