@@ -2,11 +2,8 @@ package az.apexcoach.api.analysis;
 
 import az.apexcoach.api.analysis.internal.*;
 
-
-import az.apexcoach.api.telemetry.LapEntity;
-import az.apexcoach.api.telemetry.LapRepository;
-import az.apexcoach.api.telemetry.TelemetryPointEntity;
-import az.apexcoach.api.telemetry.TelemetryPointRepository;
+import az.apexcoach.api.telemetry.TelemetryLapPort;
+import az.apexcoach.api.telemetry.TelemetryPointSnapshot;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,8 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AnalysisService {
 
-    private final LapRepository lapRepository;
-    private final TelemetryPointRepository telemetryPointRepository;
+    private final TelemetryLapPort telemetryLapPort;
     private final LapAnalysisRepository lapAnalysisRepository;
     private final BrakingAnalyzer brakingAnalyzer;
     private final ThrottleAnalyzer throttleAnalyzer;
@@ -34,10 +30,9 @@ public class AnalysisService {
 
     @Transactional
     public LapAnalysisDTO analyzeLap(String email, UUID lapId) {
-        LapEntity lap = requireOwnedLap(lapId, email);
+        telemetryLapPort.requireOwnedLap(lapId, email);
 
-        List<TelemetryPointEntity> points =
-                telemetryPointRepository.findByLapIdOrderBySessionTimeAsc(lapId);
+        List<TelemetryPointSnapshot> points = telemetryLapPort.getPoints(lapId);
 
         List<DrivingMetric> metrics = new ArrayList<>();
 
@@ -49,7 +44,7 @@ public class AnalysisService {
 
         LapAnalysisEntity analysis = lapAnalysisRepository.findByLapId(lapId)
                 .orElseGet(() -> LapAnalysisEntity.builder()
-                        .lap(lap)
+                        .lapId(lapId)
                         .build());
 
         analysis.setStatus(AnalysisStatus.COMPLETED);
@@ -67,7 +62,7 @@ public class AnalysisService {
 
     @Transactional(readOnly = true)
     public LapAnalysisDTO getAnalysis(String email, UUID lapId) {
-        requireOwnedLap(lapId, email);
+        telemetryLapPort.requireOwnedLap(lapId, email);
 
         LapAnalysisEntity analysis = lapAnalysisRepository.findByLapId(lapId)
                 .orElseThrow(() -> new NotFoundException("Analysis not found"));
@@ -75,17 +70,6 @@ public class AnalysisService {
         List<DrivingMetricDTO> metrics = parseMetrics(analysis.getResultJson());
 
         return new LapAnalysisDTO(lapId, analysis.getStatus(), metrics);
-    }
-
-    private LapEntity requireOwnedLap(UUID lapId, String email) {
-        LapEntity lap = lapRepository.findById(lapId)
-                .orElseThrow(() -> new NotFoundException("Lap not found"));
-
-        if (!email.equals(lap.getTelemetryFile().getUser().getEmail())) {
-            throw new NotFoundException("Lap not found");
-        }
-
-        return lap;
     }
 
     private String toJson(List<DrivingMetric> metrics) {

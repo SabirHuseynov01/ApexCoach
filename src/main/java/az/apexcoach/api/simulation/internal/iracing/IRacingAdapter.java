@@ -4,19 +4,16 @@ import az.apexcoach.api.simulation.NormalizedTelemetry;
 import az.apexcoach.api.simulation.SimulationTelemetryAdapter;
 import az.apexcoach.api.simulation.SimulationType;
 import az.apexcoach.api.simulation.TelemetrySource;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import shared.error.UnsupportedSimulationException;
 
 @Component
+@RequiredArgsConstructor
 public class IRacingAdapter implements SimulationTelemetryAdapter {
 
     private final IRacingPacketMapper packetMapper;
     private final IRacingLapBuilder lapBuilder;
-
-    public IRacingAdapter(IRacingPacketMapper packetMapper, IRacingLapBuilder lapBuilder) {
-        this.packetMapper = packetMapper;
-        this.lapBuilder = lapBuilder;
-    }
+    private final IRacingSharedMemoryReader sharedMemoryReader;
 
     @Override
     public SimulationType supports() {
@@ -34,7 +31,14 @@ public class IRacingAdapter implements SimulationTelemetryAdapter {
     }
 
     @Override
+    public byte[] capture() {
+        return sharedMemoryReader.read();
+    }
+
+    @Override
     public NormalizedTelemetry parse(byte[] rawTelemetry) {
-        throw new UnsupportedSimulationException("iRacing telemetry parsing is not implemented yet");
+        Object packets = packetMapper.map(rawTelemetry);
+
+        return toNormalizedTelemetry(lapBuilder.build(packets));
     }
 }

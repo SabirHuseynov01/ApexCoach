@@ -1,7 +1,7 @@
 package az.apexcoach.api.analysis.internal;
 
 import az.apexcoach.api.analysis.DrivingMetricType;
-import az.apexcoach.api.telemetry.TelemetryPointEntity;
+import az.apexcoach.api.telemetry.TelemetryPointSnapshot;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -10,16 +10,16 @@ import java.util.List;
 @Component
 public class BrakingAnalyzer {
 
-    public List<DrivingMetric> analyze(List<TelemetryPointEntity> points) {
+    public List<DrivingMetric> analyze(List<TelemetryPointSnapshot> points) {
         List<DrivingMetric> metrics = new ArrayList<>();
 
         double maxBrake = points.stream()
-                .mapToDouble(TelemetryPointEntity::getBrake)
+                .mapToDouble(TelemetryPointSnapshot::brake)
                 .max()
                 .orElse(0);
 
         double fullBrakePoints = points.stream()
-                .filter(point -> point.getBrake() > 0.9)
+                .filter(point -> point.brake() > 0.9)
                 .count();
 
         metrics.add(new DrivingMetric(

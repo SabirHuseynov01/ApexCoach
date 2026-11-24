@@ -17,5 +17,15 @@ public enum F125PacketType {
     MOTION_EX,
     TIME_TRIAL,
     LAP_POSITIONS,
-    CAR_TELEMETRY_2
+    CAR_TELEMETRY_2;
+
+    private static final F125PacketType[] BY_PACKET_ID = values();
+
+    public static F125PacketType fromPacketId(int packetId) {
+        if (packetId < 0 || packetId >= BY_PACKET_ID.length) {
+            throw new IllegalArgumentException("Unknown F1 25 packet id: " + packetId);
+        }
+
+        return BY_PACKET_ID[packetId];
+    }
 }

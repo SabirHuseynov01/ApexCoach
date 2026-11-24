@@ -1,7 +1,7 @@
 package az.apexcoach.api.analysis.internal;
 
 import az.apexcoach.api.analysis.DrivingMetricType;
-import az.apexcoach.api.telemetry.TelemetryPointEntity;
+import az.apexcoach.api.telemetry.TelemetryPointSnapshot;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import java.util.List;
 @Component
 public class SectorAnalyzer {
 
-    public List<DrivingMetric> analyze(List<TelemetryPointEntity> points) {
+    public List<DrivingMetric> analyze(List<TelemetryPointSnapshot> points) {
         List<DrivingMetric> metrics = new ArrayList<>();
 
         if (points.isEmpty()) {
@@ -18,7 +18,7 @@ public class SectorAnalyzer {
         }
 
         double maxDistance = points.stream()
-                .mapToDouble(TelemetryPointEntity::getLapDistance)
+                .mapToDouble(TelemetryPointSnapshot::lapDistance)
                 .max()
                 .orElse(0);
 
@@ -62,10 +62,10 @@ public class SectorAnalyzer {
         return metrics;
     }
 
-    private double averageSpeed(List<TelemetryPointEntity> points, double from, double to) {
+    private double averageSpeed(List<TelemetryPointSnapshot> points, double from, double to) {
         return points.stream()
-                .filter(p -> p.getLapDistance() >= from && p.getLapDistance() < to)
-                .mapToDouble(TelemetryPointEntity::getSpeed)
+                .filter(p -> p.lapDistance() >= from && p.lapDistance() < to)
+                .mapToDouble(TelemetryPointSnapshot::speed)
                 .average()
                 .orElse(0);
     }

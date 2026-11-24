@@ -1,7 +1,7 @@
 package az.apexcoach.api.analysis.internal;
 
 import az.apexcoach.api.analysis.DrivingMetricType;
-import az.apexcoach.api.telemetry.TelemetryPointEntity;
+import az.apexcoach.api.telemetry.TelemetryPointSnapshot;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -10,16 +10,16 @@ import java.util.List;
 @Component
 public class ConsistencyAnalyzer {
 
-    public List<DrivingMetric> analyze(List<TelemetryPointEntity> points) {
+    public List<DrivingMetric> analyze(List<TelemetryPointSnapshot> points) {
         List<DrivingMetric> metrics = new ArrayList<>();
 
         double avgSpeed = points.stream()
-                .mapToDouble(TelemetryPointEntity::getSpeed)
+                .mapToDouble(TelemetryPointSnapshot::speed)
                 .average()
                 .orElse(0);
 
         double speedVariance = points.stream()
-                .mapToDouble(point -> Math.pow(point.getSpeed() - avgSpeed, 2))
+                .mapToDouble(point -> Math.pow(point.speed() - avgSpeed, 2))
                 .average()
                 .orElse(0);
 

@@ -4,19 +4,16 @@ import az.apexcoach.api.simulation.NormalizedTelemetry;
 import az.apexcoach.api.simulation.SimulationTelemetryAdapter;
 import az.apexcoach.api.simulation.SimulationType;
 import az.apexcoach.api.simulation.TelemetrySource;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import shared.error.UnsupportedSimulationException;
 
 @Component
+@RequiredArgsConstructor
 public class LeMansUltimateAdapter implements SimulationTelemetryAdapter {
 
     private final LmuPacketMapper packetMapper;
     private final LmuLapBuilder lapBuilder;
-
-    public LeMansUltimateAdapter(LmuPacketMapper packetMapper, LmuLapBuilder lapBuilder) {
-        this.packetMapper = packetMapper;
-        this.lapBuilder = lapBuilder;
-    }
+    private final LmuSharedMemoryReader sharedMemoryReader;
 
     @Override
     public SimulationType supports() {
@@ -34,7 +31,14 @@ public class LeMansUltimateAdapter implements SimulationTelemetryAdapter {
     }
 
     @Override
+    public byte[] capture() {
+        return sharedMemoryReader.read();
+    }
+
+    @Override
     public NormalizedTelemetry parse(byte[] rawTelemetry) {
-        throw new UnsupportedSimulationException("LMU telemetry parsing is not implemented yet");
+        Object packets = packetMapper.map(rawTelemetry);
+
+        return toNormalizedTelemetry(lapBuilder.build(packets));
     }
 }

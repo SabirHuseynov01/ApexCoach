@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:16
+    container_name: apexcoach-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: apexcoach
+      POSTGRES_USER: apexcoach
+      POSTGRES_PASSWORD: apexcoach
+    ports:
+      - "5432:5432"
+    volumes:
+      - apexcoach-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U apexcoach -d apexcoach"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  apexcoach-db-data:

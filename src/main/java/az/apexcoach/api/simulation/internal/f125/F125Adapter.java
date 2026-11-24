@@ -1,23 +1,19 @@
 package az.apexcoach.api.simulation.internal.f125;
 
-
 import az.apexcoach.api.simulation.NormalizedTelemetry;
 import az.apexcoach.api.simulation.SimulationTelemetryAdapter;
 import az.apexcoach.api.simulation.SimulationType;
 import az.apexcoach.api.simulation.TelemetrySource;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import shared.error.UnsupportedSimulationException;
 
 @Component
+@RequiredArgsConstructor
 public class F125Adapter implements SimulationTelemetryAdapter {
 
     private final F125PacketMapper packetMapper;
     private final F125LapBuilder lapBuilder;
-
-    public F125Adapter(F125PacketMapper packetMapper, F125LapBuilder lapBuilder) {
-        this.packetMapper = packetMapper;
-        this.lapBuilder = lapBuilder;
-    }
+    private final F125UdpReceiver udpReceiver;
 
     @Override
     public SimulationType supports() {
@@ -35,7 +31,14 @@ public class F125Adapter implements SimulationTelemetryAdapter {
     }
 
     @Override
+    public byte[] capture() {
+        return udpReceiver.receive();
+    }
+
+    @Override
     public NormalizedTelemetry parse(byte[] rawTelemetry) {
-        throw new UnsupportedSimulationException("F1 25 telemetry parsing is not implemented yet");
+        Object packets = packetMapper.map(rawTelemetry);
+
+        return toNormalizedTelemetry(lapBuilder.build(packets));
     }
 }

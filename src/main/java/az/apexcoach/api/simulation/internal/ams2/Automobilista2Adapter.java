@@ -4,19 +4,17 @@ import az.apexcoach.api.simulation.NormalizedTelemetry;
 import az.apexcoach.api.simulation.SimulationTelemetryAdapter;
 import az.apexcoach.api.simulation.SimulationType;
 import az.apexcoach.api.simulation.TelemetrySource;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import shared.error.UnsupportedSimulationException;
 
 @Component
+@RequiredArgsConstructor
 public class Automobilista2Adapter implements SimulationTelemetryAdapter {
 
     private final Ams2PacketMapper packetMapper;
     private final Ams2LapBuilder lapBuilder;
-
-    public Automobilista2Adapter(Ams2PacketMapper packetMapper, Ams2LapBuilder lapBuilder) {
-        this.packetMapper = packetMapper;
-        this.lapBuilder = lapBuilder;
-    }
+    private final Ams2UdpReceiver udpReceiver;
+    private final Ams2SharedMemoryReader sharedMemoryReader;
 
     @Override
     public SimulationType supports() {
@@ -34,7 +32,20 @@ public class Automobilista2Adapter implements SimulationTelemetryAdapter {
     }
 
     @Override
+    public byte[] capture() {
+        byte[] udpTelemetry = udpReceiver.receive();
+
+        if (udpTelemetry != null && udpTelemetry.length > 0) {
+            return udpTelemetry;
+        }
+
+        return sharedMemoryReader.read();
+    }
+
+    @Override
     public NormalizedTelemetry parse(byte[] rawTelemetry) {
-        throw new UnsupportedSimulationException("AMS2 telemetry parsing is not implemented yet");
+        Object packets = packetMapper.map(rawTelemetry);
+
+        return toNormalizedTelemetry(lapBuilder.build(packets));
     }
 }

@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/apexcoach
+    username: apexcoach
+    password: apexcoach
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+apexcoach:
+  security:
+    jwt-secret: local-development-only-secret-change-me-0123456789
+    jwt-expiration: 3600

@@ -6,14 +6,15 @@ import az.apexcoach.api.identity.UserLookupPort;
 
 import az.apexcoach.api.simulation.NormalizedLap;
 import az.apexcoach.api.simulation.NormalizedTelemetry;
-import az.apexcoach.api.simulation.SimulationTelemetryService;
 import az.apexcoach.api.simulation.SimulationType;
+import az.apexcoach.api.simulation.SimulationTelemetryService;
 import az.apexcoach.api.telemetry.internal.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import shared.error.NotFoundException;
+import shared.error.UnsupportedSimulationException;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -34,6 +35,11 @@ public class TelemetryService {
     public TelemetryUploadResponse upload(String email, SimulationType simulationType, MultipartFile file) {
         UserEntity user = userLookupPort.requireUser(email);
 
+        if (!simulationTelemetryService.supports(simulationType)) {
+            throw new UnsupportedSimulationException(
+                    "Telemetry upload is not supported for: " + simulationType);
+        }
+
         byte[] content;
 
         try {
@@ -42,9 +48,7 @@ public class TelemetryService {
             throw new NotFoundException("Unable to read uploaded file");
         }
 
-        NormalizedTelemetry normalized = simulationType == SimulationType.GENERIC_CSV
-                ? csvTelemetryParser.parse(content)
-                : simulationTelemetryService.parse(simulationType, content);
+        NormalizedTelemetry normalized = parseUpload(simulationType, content);
 
         TelemetryFileEntity telemetryFile = TelemetryFileEntity.builder()
                 .user(user)
@@ -85,6 +89,14 @@ public class TelemetryService {
                 .stream()
                 .map(this::toDto)
                 .toList();
+    }
+
+    private NormalizedTelemetry parseUpload(SimulationType simulationType, byte[] content) {
+        if (simulationType == SimulationType.GENERIC_CSV) {
+            return csvTelemetryParser.parse(content);
+        }
+
+        return simulationTelemetryService.parse(simulationType, content);
     }
 
     private LapEntity toLapEntity(TelemetryFileEntity telemetryFile, NormalizedLap lap) {

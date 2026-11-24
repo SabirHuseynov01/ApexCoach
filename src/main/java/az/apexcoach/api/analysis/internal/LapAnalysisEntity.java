@@ -1,7 +1,6 @@
 package az.apexcoach.api.analysis.internal;
 
 import az.apexcoach.api.analysis.AnalysisStatus;
-import az.apexcoach.api.telemetry.LapEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,9 +20,8 @@ public class LapAnalysisEntity {
     @GeneratedValue
     private UUID id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lap_id", nullable = false, unique = true)
-    private LapEntity lap;
+    @Column(name = "lap_id", nullable = false, unique = true)
+    private UUID lapId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

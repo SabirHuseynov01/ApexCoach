@@ -1,7 +1,7 @@
 package az.apexcoach.api.analysis.internal;
 
 import az.apexcoach.api.analysis.DrivingMetricType;
-import az.apexcoach.api.telemetry.TelemetryPointEntity;
+import az.apexcoach.api.telemetry.TelemetryPointSnapshot;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -10,16 +10,16 @@ import java.util.List;
 @Component
 public class ThrottleAnalyzer {
 
-    public List<DrivingMetric> analyze(List<TelemetryPointEntity> points) {
+    public List<DrivingMetric> analyze(List<TelemetryPointSnapshot> points) {
         List<DrivingMetric> metrics = new ArrayList<>();
 
         double avgThrottle = points.stream()
-                .mapToDouble(TelemetryPointEntity::getThrottle)
+                .mapToDouble(TelemetryPointSnapshot::throttle)
                 .average()
                 .orElse(0);
 
         double fullThrottlePoints = points.stream()
-                .filter(point -> point.getThrottle() > 0.95)
+                .filter(point -> point.throttle() > 0.95)
                 .count();
 
         metrics.add(new DrivingMetric(

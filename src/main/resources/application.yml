@@ -1,1 +1,18 @@
-spring.application.name=ApexCoach
+spring:
+  application:
+    name: ApexCoach
+  datasource:
+    url: jdbc:postgresql://localhost:5432/apexcoach
+    username: apexcoach
+    password: apexcoach
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: ${DB_DDL_AUTO:update}
+
+apexcoach:
+  security:
+    # Must be at least 32 bytes. Always set JWT_SECRET outside local development.
+    jwt-secret: ${JWT_SECRET:local-development-only-secret-change-me-0123456789}
+    jwt-expiration: ${JWT_EXPIRATION_SECONDS:3600}

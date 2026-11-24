@@ -4,19 +4,17 @@ import az.apexcoach.api.simulation.NormalizedTelemetry;
 import az.apexcoach.api.simulation.SimulationTelemetryAdapter;
 import az.apexcoach.api.simulation.SimulationType;
 import az.apexcoach.api.simulation.TelemetrySource;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import shared.error.UnsupportedSimulationException;
 
 @Component
+@RequiredArgsConstructor
 public class AccAdapter implements SimulationTelemetryAdapter {
 
     private final AccPacketMapper packetMapper;
     private final AccLapBuilder lapBuilder;
-
-    public AccAdapter(AccPacketMapper packetMapper, AccLapBuilder lapBuilder) {
-        this.packetMapper = packetMapper;
-        this.lapBuilder = lapBuilder;
-    }
+    private final AccUdpReceiver udpReceiver;
+    private final AccSharedMemoryReader sharedMemoryReader;
 
     @Override
     public SimulationType supports() {
@@ -34,7 +32,20 @@ public class AccAdapter implements SimulationTelemetryAdapter {
     }
 
     @Override
+    public byte[] capture() {
+        byte[] udpTelemetry = udpReceiver.receive();
+
+        if (udpTelemetry != null && udpTelemetry.length > 0) {
+            return udpTelemetry;
+        }
+
+        return sharedMemoryReader.read();
+    }
+
+    @Override
     public NormalizedTelemetry parse(byte[] rawTelemetry) {
-        throw new UnsupportedSimulationException("ACC telemetry parsing is not implemented yet");
+        Object packets = packetMapper.map(rawTelemetry);
+
+        return toNormalizedTelemetry(lapBuilder.build(packets));
     }
 }
